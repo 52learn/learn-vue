@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+   
+</head>
+<body>
+    <div id="app">
+        {{msg}}
+        <h2>{{ web.url }}</h2>
+        <h2>{{ web.title }}</h2>
+
+        number(ref)：{{ number }}<br/>
+        person(ref object): {{ person.name }}<br/>
+
+        web pv: {{ web.pv }}<br/>
+
+        <br/>
+        <br/>
+        <button v-on:click="edit">修改</button><br/>
+        <button @click="edit">修改</button><br/>
+        <button @click="add(2,3)">增加pv</button><br/>
+        <br/><br/>
+        -------------------------------------------------------------<br/>
+        回车：<input type="text" @keyup.enter="add(2,3)" /><br/>
+        空格：<input type="text" @keyup.space="add(2,3)" /><br/>
+        Tab：<input type="text" @keydown.tab="add(2,3)" /><br/>
+        W: <input type="text" @keyup.w="add(2,3)" /><br/>
+        
+        <!-- 组合快捷键 -->
+        Ctrl + Enter : <input type="text" @keyup.ctrl.enter="add(2,3)"/><br/>
+        Ctrl + A : <input type="text" @keyup.ctrl.a="add(2,3)"/><br/>
+        <br/><br/>
+       ----- v-if 和 v-show的使用 --------------------------------------------------------<br/>
+       
+        <div v-show="web.show">我会显示也会影藏v-show</div><br/>
+        <div v-if="web.show">v-if</div><br/>
+        <button @click="toggleVisibility()">切换可见性</button><br/>
+        <p v-if="web.pv<100">小型网站</p>
+        <p v-else-if="web.pv>=100 && web.pv<1000">中型网站</p>
+        <p v-else-if="web.pv>=1000 && web.pv<=10000">大型网站</p>
+        <p v-else>超大型网站</p>
+        <button @click="addPV(1000)">增加PV</button>
+        <br/><br/>
+        ----- 单向绑定 v-bind --------------------------------------------------------<br/>
+        地址(单向绑定)：<input type="text"  :value="person.address"/><br/>
+        <button @click="printAddress()">printAddress</button>
+        <br/><br/>
+        ----- 遍历数组或对象 v-for --------------------------------------------------------<br/>
+        <ul>
+            <li v-for="value in person.likes">
+                {{value}}
+            </li>
+        </ul>
+        <ul>
+            <li v-for="(value,index) in person.likes">
+               {{index}}->{{value}}
+            </li>
+        </ul>
+        <ul>
+            <li v-for="(value,key) in person">
+                {{key}}->{{value}}
+            </li>
+        </ul>
+        <ul>
+            <li v-for="(value,key,index) in person">
+               {{index}}-> {{key}}->{{value}}
+            </li>
+        </ul>
+        <br/><br/>
+        ----- 遍历数组或对象 v-model --------------------------------------------------------<br/>
+        地址(双向绑定)：<input type="text" v-model="person.address">
+        <button @click="printAddress()">printAddress</button><br/><br/>
+        <input type="radio" v-model="web.color" value="black">黑色
+        <input type="radio" v-model="web.color" value="white">白色
+        <br/><br/>
+
+        <input type="checkbox" v-model="web.fruits" value="apple"/> apple
+        <input type="checkbox" v-model="web.fruits" value="banana"/> banana
+        <br/><br/>
+        <input type="checkbox" v-model="web.remember">记住密码
+        <br/><br/>
+        <select v-model="web.skill">
+            <option value="">请选择</option>
+            <option value="css">CSS</option>
+            <option value="html">HTML</option>
+            <option value="js">js</option>
+        </select><br/>
+        <button @click="printWeb()">printWeb</button><br/><br/>
+        <br/><br/>
+        -----  v-model 修饰符--------------------------------------------------------<br/>
+        web.url: {{web.url}}<br/>
+        web.pv : {{web.pv}}<br/>
+        在失去焦点或按下回车键之后渲染: <input type="text" v-model.lazy="web.url"/> <br/>
+        输入框的值转换为数字类型: <input type="text" v-model.number="web.pv"/> <br/>
+        去除首尾空格 : <input type="text" v-model.trim="web.url"> <br/>
+
+        <br/><br/>
+        -----  v-text 和 v-html --------------------------------------------------------<br/>
+        <!-- v-text 将数据解析为纯文本格式 -->
+        <h3 v-text="web.text"></h3>
+
+        <!-- v-html 将数据解析为 html 格式 -->
+        <h3 v-html="web.html"></h3>
+
+        <br/><br/>
+        -----  computed 缓存 --------------------------------------------------------<br/>
+        x + y = {{sum}}<br/>
+        x + y = {{sum}}<br/>
+        x:<input type="text" value-model="data.x"/><br/>
+        y:<input type="text" value-model="data.y"/><br/>
+        <br/><br/>
+        -----  监听器watch --------------------------------------------------------<br/>
+        爱好
+        <select v-model="hobby">
+            <option value="">请选择</option>
+            <option value="1">写作</option>
+            <option value="2">画画</option>
+            <option value="3">运动</option>
+        </select>
+
+
+    </div>
+    <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+    <script type="module">
+        import {createApp,reactive,ref,computed,watch} from "./vue.esm-browser.js";
+        createApp({
+            // setup选项 用于设置响应式数据和方法等
+            setup(){
+
+                const number = ref(1000);
+                number.value = 3000;
+
+                const person = ref({
+                    name:"kim",
+                    address:"杭州萧山区",
+                    likes: ["swimming","running","football"]
+                })
+                const web = reactive({
+                    title:"kim learn vue",
+                    url:"www.kim-learn-vue.com",
+                    pv: 0,
+                    show: true,
+                    color: "white",
+                    fruits: ["apple","banana"],
+                    remember: true,
+                    skill: "html",
+                    text:"<i style='color:blue;'>www.dengruicode.com</i>",
+                    html:"<i style='color:blue;'>www.dengruicode.com</i>"
+                });
+
+                const edit = () => {
+                    web.url = "www.1111.com";
+                }
+
+                const add = (a,b)=>{
+                    web.pv = web.pv+a+b;
+                }
+                const toggleVisibility = ()=>{
+                    web.show = !web.show;
+                }
+                const addPV = (pv)=>{
+                    web.pv +=pv;
+                }
+                const printAddress = ()=>{
+                    console.log("person address:",person.value.address);
+                }
+                const printWeb =()=>{
+                    console.log("web object :",web," web.skill:",web.skill);
+                }
+                const data = reactive({
+                    x:0,
+                    y:0
+                });
+                 //计算属性-有缓存 [计算属性根据其依赖的响应式数据变化而重新计算]
+                const sum = computed(
+                    ()=>{
+                        console.log("sum....");
+                        return data.x+data.y;
+                    }
+                );
+                const hobby = ref("") //爱好
+                   //监听 hobby
+                watch(hobby, (newValue, oldValue) => {
+                    console.log("oldValue", oldValue, "newValue", newValue)
+
+                    if (newValue == "2") {
+                        console.log("画画")
+                    }
+                })
+                return{
+                    msg: "success",
+                    web,
+                    number,
+                    person,
+                    edit,
+                    add,
+                    toggleVisibility,
+                    addPV,
+                    printAddress,
+                    printWeb,
+                    data,
+                    sum,
+                    hobby
+                }
+            }
+        }).mount("#app");
+
+    </script>
+</body>
+</html>
